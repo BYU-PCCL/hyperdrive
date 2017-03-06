@@ -7,9 +7,10 @@ setup(
     url='http://github.com/mwilliammyers/hyperdrive',
     author='BYU-PCCL',
     license='MIT',
-    packages=['hyperdrive'],
+    # packages=['hyperdrive'],
     install_requires=[
         'ansible',
-        'boto'
+        'boto',
+        'docker'
     ],
     zip_safe=False)
