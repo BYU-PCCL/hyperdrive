@@ -1,5 +1,23 @@
+import sys
 from setuptools import setup, find_packages
+from setuptools.command.test import test as TestCommand
 import hyperdrive
+
+
+class PyTest(TestCommand):
+    # `$ python setup.py test' simply installs minimal requirements
+    # and runs the tests with no fancy stuff like parallel execution.
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = [
+            '--doctest-modules', '--verbose', './hyperdrive', './test'
+        ]
+        self.test_suite = True
+
+    def run_tests(self):
+        import pytest
+        sys.exit(pytest.main(self.test_args))
+
 
 setup(
     name='hyperdrive',
@@ -16,6 +34,10 @@ setup(
         'boto',
         'docker'
     ],
+    tests_require=[
+        'pytest'
+    ],
+    cmdclass={'test': PyTest},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python',
