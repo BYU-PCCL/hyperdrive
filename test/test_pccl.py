@@ -9,8 +9,7 @@ def client():
 
 @pytest.fixture(scope="module")
 def docker_service():
-    import hyperdrive.providers.cluster
-    return hyperdrive.providers.cluster.Docker()
+    return hyperdrive.pccl.Pccl()
 
-def test_initialize():
+def test_build():
     pass

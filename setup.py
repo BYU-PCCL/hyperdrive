@@ -31,7 +31,6 @@ setup(
         ],
     },
     install_requires=[
-        'boto',
         'docker'
     ],
     tests_require=[

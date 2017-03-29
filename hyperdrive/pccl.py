@@ -2,7 +2,8 @@ import providers
 
 class Pccl(providers.cluster.Docker):
     def build(self):
-        pass
+        print(self.client.images.list())
 
     def run(self):
         pass
+p[]
