@@ -1,22 +1,58 @@
+from __future__ import print_function
 import sys
-from setuptools import setup, find_packages
+import os
+import shutil
+import glob
+from setuptools import setup, find_packages, Command
 from setuptools.command.test import test as TestCommand
 import hyperdrive
 
 
 class PyTest(TestCommand):
-    # `$ python setup.py test' simply installs minimal requirements
-    # and runs the tests with no fancy stuff like parallel execution.
+    description = 'run unit tests'
+
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = [
-            '--doctest-modules', '--verbose', './hyperdrive', './test'
-        ]
+        self.test_args = ['--verbose', '--capture=no']
         self.test_suite = True
 
     def run_tests(self):
         import pytest
         sys.exit(pytest.main(self.test_args))
+
+
+class Clean(Command):
+    description = 'remove build files'
+    user_options = []
+
+    def initialize_options(self):
+        """Set default values for options."""
+        pass
+
+    def finalize_options(self):
+        """Post-process options."""
+        pass
+
+    def run(self):
+        """Run clean."""
+
+        def respect_dry_run(path, fn):
+            if self.dry_run:
+                print('would remove {}...'.format(path))
+            else:
+                if self.verbose > 1:
+                    print('removing {}...'.format(path))
+                fn(path)
+
+        for d in [
+                './dist/', './build/', './__pycache__/',
+                './hyperdrive.egg-info/', './test/__pycache__'
+        ]:
+            if os.path.isdir(d):
+                respect_dry_run(d, shutil.rmtree)
+
+        for f in glob.glob('*.pyc'):
+            respect_dry_run(f, os.remove)
 
 
 setup(
@@ -26,24 +62,20 @@ setup(
     license=hyperdrive.__licence__,
     packages=find_packages(),
     entry_points={
-        'console_scripts': [
-            'hyperdrive = hyperdrive.__main__:main',
-        ],
+        'console_scripts': ['hyperdrive = hyperdrive.__main__:main',],
     },
-    install_requires=[
-        'docker'
-    ],
-    tests_require=[
-        'pytest'
-    ],
-    cmdclass={'test': PyTest},
+    install_requires=['docker'],
+    tests_require=['pytest'],
+    cmdclass={
+        'test': PyTest,
+        'clean': Clean,
+    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.1',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
