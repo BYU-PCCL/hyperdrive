@@ -97,4 +97,4 @@ ENV/
 
 
 ### Project specific ###
-test/fixtures/Dockerfile*
+Dockerfile*
