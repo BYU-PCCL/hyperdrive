@@ -9,13 +9,14 @@ def docker():
 
 def test_build(docker):
     import os
-    assert docker.build(path=os.path.abspath('./test/fixtures'), quiet=False)
+    assert docker.build(
+        'python:3-alpine', path=os.path.abspath('./test/fixtures'), quiet=False)
 
 
 def test_run_cpu(docker):
-    assert docker.run(command=['python', 'test.py', 'Hello', 'world!'])
+    assert docker.run(command=['python3', 'test.py', 'Hello', 'world!'])
 
 
 def test_run_gpu(docker):
     assert docker.run(
-        command=['python', 'test.py', 'Hello', 'world!'], runtime='nvidia')
+        command=['python3', 'test.py', 'Hello', 'world!'], runtime='nvidia')
