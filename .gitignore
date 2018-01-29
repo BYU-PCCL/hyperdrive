@@ -1,4 +1,3 @@
-
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -95,3 +94,7 @@ ENV/
 
 ### Ansible ###
 *.retry
+
+
+### Project specific ###
+test/fixtures/Dockerfile*
