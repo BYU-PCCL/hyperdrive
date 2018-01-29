@@ -3,7 +3,7 @@
 """
 import sys
 import argparse
-import hyperdrive
+import hyperdrive.provider
 
 
 def _port(arg):
@@ -20,8 +20,6 @@ def main():
         '--version',
         action='version',
         version='%(prog)s {}'.format(hyperdrive.__version__))
-    parser.add_argument(
-        '-v', '--verbose', action='count', default=0, help='increase verbosity')
     parser.add_argument(
         '-m',
         '--manager',
@@ -44,6 +42,10 @@ def main():
         ' maps external port 8888 to docker image port 8888 and 8081 to 8080)')
 
     args, _ = parser.parse_known_args()
+
+    pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
+    pccl.build(args.base_image, path='./', ports=dict(args.port or []))
+    pccl.deploy()
 
 
 if __name__ == '__main__':
