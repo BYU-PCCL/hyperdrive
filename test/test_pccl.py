@@ -1,5 +1,5 @@
 import pytest
-import hyperdrive
+import hyperdrive.provider
 
 
 @pytest.fixture(scope='module')
