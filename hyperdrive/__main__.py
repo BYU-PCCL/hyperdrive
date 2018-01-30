@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """The main entry point. Invoke as `hyperdrive' or `python -m hyperdrive'.
 """
-import sys
 import argparse
 import hyperdrive.provider
+import sys
 
 
 def _port(arg):

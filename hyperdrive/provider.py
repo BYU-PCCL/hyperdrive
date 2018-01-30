@@ -1,10 +1,10 @@
 import abc
+import docker
+import errno
+import hyperdrive
+import os
 import os.path
 import uuid
-import os
-import errno
-import docker
-import hyperdrive
 
 
 class Provider(object):
