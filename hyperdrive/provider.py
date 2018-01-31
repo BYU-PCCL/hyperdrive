@@ -1,4 +1,3 @@
-import abc
 import docker
 import errno
 import hyperdrive
@@ -7,41 +6,9 @@ import os.path
 import uuid
 
 
-class Provider(object):
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def initialize(self):
-        raise NotImplementedError('must implement `initialize`')
-
-    @abc.abstractmethod
-    def deploy(self):
-        raise NotImplementedError('must implement `deploy`')
-
-    @abc.abstractmethod
-    def status(self):
-        raise NotImplementedError('must implement `status`')
-
-    @abc.abstractmethod
-    def destroy(self):
-        raise NotImplementedError('must implement `destroy`')
-
-    @abc.abstractmethod
-    def build(self, path):
-        raise NotImplementedError('must implement `build`')
-
-    @abc.abstractmethod
-    def run(self, command):
-        raise NotImplementedError('must implement `run`')
+class Docker:
 
 
-class Docker(Provider):
-
-    def __init__(self, base_url, client=None):
-        if client is None:
-            client = docker.DockerClient(base_url=base_url)
-        self.client = client
-        self.image = None
 
     def build(self,
               base_image,
@@ -75,7 +42,7 @@ class Docker(Provider):
             **kwargs)
 
 
-class Pccl(Docker, Provider):
+class Pccl(Docker):
 
     def __init__(self, base_url):
         super(self.__class__, self).__init__(base_url)
