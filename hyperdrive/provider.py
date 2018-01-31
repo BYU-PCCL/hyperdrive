@@ -1,5 +1,6 @@
 import docker
 import errno
+import getpass
 import hyperdrive
 import os
 import os.path
@@ -8,12 +9,21 @@ import uuid
 
 class Docker:
 
+    def __init__(self, base_url, name=None):
+        self.base_url = base_url
+        self.client = docker.DockerClient(base_url=base_url)
+        self.image = self.client.image.get(name) if name else None
 
+    @property
+    def repository(self):
+        return self.image.attrs['RepoTags'][-1] if self.image else None
 
     def build(self,
               base_image,
               path='./',
-              tag='pccl/hyperdrive-{}'.format(str(uuid.uuid4())[:8]),
+              tag='{}/hyperdrive-{}-{}'.format(hyperdrive.docker_registry,
+                                               getpass.getuser(),
+                                               os.path.basename(os.getcwd())),
               pull=True,
               shmsize=1000000000,
               **kwargs):
@@ -31,7 +41,13 @@ class Docker:
                 ])
 
         self.image = self.client.images.build(path=path, tag=tag, pull=pull)
+
         return self.image
+
+    def push(self, repository=None, stream=False, **kwargs):
+        if repository is None:
+            repository = self.repository
+        self.client.images.push(repository, stream=stream, **kwargs)
 
     def run(self, command, remove=True, shm_size=1000000000, **kwargs):
         return self.client.containers.run(
@@ -44,12 +60,13 @@ class Docker:
 
 class Pccl(Docker):
 
-    def __init__(self, base_url):
+    def __init__(self, base_url, name=None):
         super(self.__class__, self).__init__(base_url)
-        self.service = None
+        self.service = self.client.services.get(name) if name else None
 
     def deploy(self,
-               name='hyperdrive-{}'.format(str(uuid.uuid4())[:8]),
+               name='hyperdrive-{}-{}'.format(getpass.getuser(),
+                                              str(uuid.uuid4())[:8]),
                mode=docker.types.ServiceMode('replicated', replicas=1),
                restart_policy=docker.types.RestartPolicy(condition='none'),
                **kwargs):
@@ -60,6 +77,9 @@ class Pccl(Docker):
             restart_policy=restart_policy,
             **kwargs)
         return self.service
+
+    def logs(self, **kwargs):
+        return self.service.logs(stdout=True, **kwargs)
 
     def status(self):
         return self.service.tasks()
