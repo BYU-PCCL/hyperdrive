@@ -13,5 +13,5 @@ default_docker_manager_url = os.environ.get('HYPERDRIVE_DOCKER_MANAGER_URL',
 default_docker_builder_url = os.environ.get('HYPERDRIVE_DOCKER_BUILDER_URL',
                                             'unix://var/run/docker.sock')
 
-default_docker_base_image = os.environ.get('HYPERDRIVE_DOCKER_BASE_IMAGE',
-                                           'tensorflow/tensorflow:gpu-py3')
+default_docker_base_image = os.environ.get(
+    'HYPERDRIVE_DOCKER_BASE_IMAGE', 'tensorflow/tensorflow:latest-gpu-py3')
