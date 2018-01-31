@@ -24,6 +24,7 @@ class Docker:
               tag='{}/hyperdrive-{}-{}'.format(hyperdrive.docker_registry,
                                                getpass.getuser(),
                                                os.path.basename(os.getcwd())),
+              command=None,
               pull=True,
               shmsize=1000000000,
               **kwargs):
@@ -35,10 +36,14 @@ class Docker:
                 raise
         else:
             with os.fdopen(handle, 'w') as f:
-                f.writelines([
+                content = [
+                    '# see: https://docs.docker.com/engine/reference/builder/\n',
                     'FROM {}\n'.format(base_image),
                     'COPY . .\n',
-                ])
+                ]
+                if command:
+                    content.append('CMD {}'.format(command))
+                f.writelines(content)
 
         self.image = self.client.images.build(path=path, tag=tag, pull=pull)
 
