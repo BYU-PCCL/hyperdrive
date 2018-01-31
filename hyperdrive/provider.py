@@ -76,7 +76,7 @@ class Pccl(Docker):
                restart_policy=docker.types.RestartPolicy(condition='none'),
                **kwargs):
         self.service = self.client.services.create(
-            self.image.attrs['RepoTags'][0],  # TODO: best way to get image?
+            self.repository,
             name=name,
             mode=mode,
             restart_policy=restart_policy,
