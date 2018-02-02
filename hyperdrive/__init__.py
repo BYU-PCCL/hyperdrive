@@ -13,4 +13,4 @@ default_docker_manager_url = os.environ.get('HYPERDRIVE_DOCKER_MANAGER_URL',
 default_docker_base_image = os.environ.get(
     'HYPERDRIVE_DOCKER_BASE_IMAGE', 'tensorflow/tensorflow:latest-gpu-py3')
 
-docker_registry = 'localhost:5000'
+docker_registry = '127.0.0.1:5000'
