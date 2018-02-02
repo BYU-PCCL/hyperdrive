@@ -106,23 +106,27 @@ def run():
     if args.command == 'status':
         for j in args.job:
             pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
+
             from pprint import pprint
             pprint(pccl.status())
     elif args.command == 'logs':
         for j in args.job:
             pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
+
             print(j)
             for line in pccl.logs(follow=args.follow, tail=args.lines):
                 print(line.decode())
     elif args.command == 'deploy':
         pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
+
         pccl.build(args.base_image, path='./', command=args.cmd)
+
         pccl.push()
-        pccl.deploy(
-            resources=docker.types.Resources(
-                generic_reservations=args.resources),
-            endpoint_spec=docker.types.EndpointSpec(
-                mode='vip', ports=args.ports))
+
+        r = docker.types.Resources(generic_reservations=args.resources)
+        e = docker.types.EndpointSpec(mode='vip', ports=args.ports)
+        pccl.deploy(resources=r, endpoint_spec=e)
+
         print(pccl.service.name)
     elif args.command == 'remove':
         for j in args.job:
