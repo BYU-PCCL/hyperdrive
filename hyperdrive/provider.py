@@ -67,6 +67,15 @@ class Docker:
             shm_size=shm_size,
             **kwargs)
 
+    def remove(self, image=None, force=True, **kwargs):
+        print(self.image)
+        if image is None:
+            image = self.image.id
+        # TODO: Handle stopping containers
+        image = self.client.images.remove(image, force=force, **kwargs)
+        self.client.images.prune()
+        return image
+
 
 class Pccl(Docker):
 
@@ -94,5 +103,7 @@ class Pccl(Docker):
     def status(self):
         return self.service.tasks()
 
-    def destroy(self):
-        return self.service.remove()
+    def remove(self):
+        service = self.service.remove()
+        super(Pccl, self).remove()
+        return service

@@ -65,6 +65,9 @@ def parse_args():
         ' (example: `-p 8888:8888 -p 8081:8080`'
         ' maps external port 8888 to docker image port 8888 and 8081 to 8080)')
 
+    remove_parser = subparsers.add_parser('remove', help='remove jobs')
+    remove_parser.add_argument('job', nargs='+', help='the name of the job')
+
     return parser.parse_known_args()
 
 
@@ -93,6 +96,12 @@ def run():
         pccl.push()
         pccl.deploy()
         print(pccl.service.name)
+    elif args.command == 'remove':
+        for j in args.job:
+            pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
+            print(pccl.remove())
+
+
 def main():
     try:
         run()
