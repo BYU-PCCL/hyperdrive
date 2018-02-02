@@ -62,7 +62,7 @@ setup(
     license=hyperdrive.__licence__,
     packages=find_packages(),
     entry_points={
-        'console_scripts': ['hyperdrive = hyperdrive.__main__:main',],
+        'console_scripts': ['hyperdrive = hyperdrive.__main__:main'],
     },
     install_requires=['docker'],
     tests_require=['pytest'],
