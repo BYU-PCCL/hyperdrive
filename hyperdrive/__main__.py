@@ -96,6 +96,8 @@ def run():
 def main():
     try:
         run()
+    except KeyboardInterrupt:
+        pass
     except Exception as e:
         # TODO: log verbose error
         print(getattr(e, 'explanation', e))
