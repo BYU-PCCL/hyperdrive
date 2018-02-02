@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """The main entry point. Invoke as `hyperdrive' or `python -m hyperdrive'.
 """
+from __future__ import print_function
 import argparse
 import hyperdrive.provider
 import sys
