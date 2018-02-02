@@ -69,7 +69,6 @@ class Docker:
             **kwargs)
 
     def remove(self, image=None, force=True, **kwargs):
-        print(self.image)
         if image is None:
             image = self.image.id
         # TODO: Handle stopping containers
