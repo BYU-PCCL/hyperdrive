@@ -37,10 +37,15 @@ class Docker:
         else:
             with os.fdopen(handle, 'w') as f:
                 content = [
-                    '# see: https://docs.docker.com/engine/reference/builder/\n',
+                    '# see: https://docs.docker.com/engine/reference/builder/ for Dockerfile reference\n',
                     'FROM {}\n'.format(base_image),
                     'COPY . .\n',
                 ]
+                if os.path.isfile(os.path.join(path, 'requirements.txt')):
+                    content += [
+                        'COPY ./requirements.txt .',
+                        'RUN pip install -r ./requirements.txt'
+                    ]
                 if command:
                     content.append('CMD {}'.format(command))
                 f.writelines(content)
