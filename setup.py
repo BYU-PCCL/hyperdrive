@@ -64,8 +64,11 @@ setup(
     entry_points={
         'console_scripts': ['hyperdrive = hyperdrive.__main__:main'],
     },
-    install_requires=['docker'],
+    install_requires=['docker>=3.0.0'],
     tests_require=['pytest'],
+    dependency_links=[
+        "https://github.com/BYU-PCCL/docker-py/tarball/master#egg=docker-3.0.1"
+    ],
     cmdclass={
         'test': PyTest,
         'clean': Clean,

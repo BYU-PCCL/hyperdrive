@@ -16,7 +16,7 @@ class Docker:
 
     @property
     def repository(self):
-        return self.image.attrs['RepoTags'][-1] if self.image else None
+        return self.image[0].attrs['RepoTags'][-1] if self.image else None
 
     def build(self,
               base_image,
