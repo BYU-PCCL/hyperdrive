@@ -34,10 +34,10 @@ def parse_args():
         dest='command', help='interact with jobs on the cluster')
     subparsers.required = True
 
-    status_parser = subparsers.add_parser('status', help='get status of job(s)')
+    status_parser = subparsers.add_parser('status', help='get status of jobs')
     status_parser.add_argument('job', nargs='+', help='the name of the job')
 
-    logs_parser = subparsers.add_parser('logs', help='get logs for job(s)')
+    logs_parser = subparsers.add_parser('logs', help='get logs for jobs')
     logs_parser.add_argument('job', nargs='+', help='the name of the job')
     logs_parser.add_argument(
         '-f',
