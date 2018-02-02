@@ -72,16 +72,23 @@ class Docker:
         if image is None:
             image = self.image.id
         # TODO: Handle stopping containers
-        image = self.client.images.remove(image, force=force, **kwargs)
+        self.client.images.remove(image, force=force, **kwargs)
         self.client.images.prune()
-        return image
 
 
 class Pccl(Docker):
 
     def __init__(self, base_url, name=None):
         super(self.__class__, self).__init__(base_url)
-        self.service = self.client.services.get(name) if name else None
+        self.service = None
+        if name:
+            self.service = self.client.services.get(name)
+            try:
+                attrs = self.service.attrs
+                img = attrs['Spec']['TaskTemplate']['ContainerSpec']['Image']
+                self.image = self.client.images.get(img)
+            except KeyError:
+                pass
 
     def deploy(self,
                name='hyperdrive_{}_{}'.format(getpass.getuser(),
@@ -104,6 +111,5 @@ class Pccl(Docker):
         return self.service.tasks()
 
     def remove(self):
-        service = self.service.remove()
+        self.service.remove()
         super(Pccl, self).remove()
-        return service

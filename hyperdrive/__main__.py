@@ -127,7 +127,8 @@ def run():
     elif args.command == 'remove':
         for j in args.job:
             pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
-            print(pccl.remove())
+            pccl.remove()
+            print(j)
 
 
 def main():
