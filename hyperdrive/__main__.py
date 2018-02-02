@@ -8,6 +8,7 @@ import hyperdrive.provider
 import sys
 
 ports = {}
+resources = {}
 
 
 class StorePort(argparse.Action):
@@ -17,6 +18,18 @@ class StorePort(argparse.Action):
             k, v = kv.split(":")
             ports[int(k)] = int(v)
         setattr(namespace, self.dest, ports)
+
+
+class StoreResource(argparse.Action):
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        for kv in values.split(","):
+            k, v = kv.split("=")
+            try:
+                resources[k] = int(v)
+            except ValueError:
+                resources[k] = v
+        setattr(namespace, self.dest, resources)
 
 
 def parse_args():
@@ -72,6 +85,14 @@ def parse_args():
         help='ports to publish to make them available externally'
         ' (example: `-p 8888:8888 -p 8081:8080`'
         ' maps external port 8888 to docker image port 8888 and 8081 to 8080)')
+    deploy_parser.add_argument(
+        '-r',
+        '--resources',
+        metavar='RESOURCE',
+        default={},
+        action=StoreResource,
+        help='resources necessary for the job'
+        ' (example: `-r gpu=1` requests one gpu')
 
     remove_parser = subparsers.add_parser('remove', help='remove jobs')
     remove_parser.add_argument('job', nargs='+', help='the name of the job')
@@ -98,6 +119,8 @@ def run():
         pccl.build(args.base_image, path='./', command=args.cmd)
         pccl.push()
         pccl.deploy(
+            resources=docker.types.Resources(
+                generic_reservations=args.resources),
             endpoint_spec=docker.types.EndpointSpec(
                 mode='vip', ports=args.ports))
         print(pccl.service.name)
