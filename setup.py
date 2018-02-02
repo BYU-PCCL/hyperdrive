@@ -58,7 +58,7 @@ class Clean(Command):
 setup(
     name='hyperdrive',
     version=hyperdrive.__version__,
-    url='http://github.com/mwilliammyers/hyperdrive',
+    url='http://github.com/BYU-PCCL/hyperdrive',
     license=hyperdrive.__licence__,
     packages=find_packages(),
     entry_points={
