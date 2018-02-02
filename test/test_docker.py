@@ -2,15 +2,17 @@ import hyperdrive.provider
 import pytest
 
 
-@pytest.fixture(scope='module')
-def docker():
-    return hyperdrive.provider.Docker(base_url='tcp://doctor.cs.byu.edu:2375')
+@pytest.fixture(scope='function')
+def docker(request):
+    d = hyperdrive.provider.Docker(base_url='tcp://monster.cs.byu.edu:2375')
+    request.addfinalizer(lambda: d.remove())
+    return d
 
 
 def test_build(docker):
     import os
     assert docker.build(
-        'python:3-alpine', path=os.path.abspath('./test/fixtures'), quiet=False)
+        'python:3-alpine', path=os.path.abspath('./test/fixtures'))
 
 
 def test_run_cpu(docker):
