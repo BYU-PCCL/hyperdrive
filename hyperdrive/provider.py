@@ -97,8 +97,8 @@ class Pccl(Docker):
             **kwargs)
         return self.service
 
-    def logs(self, **kwargs):
-        return self.service.logs(stdout=True, **kwargs)
+    def logs(self, stdout=True, stderr=True, **kwargs):
+        return self.service.logs(stdout=stdout, stderr=stderr, **kwargs)
 
     def status(self):
         return self.service.tasks()

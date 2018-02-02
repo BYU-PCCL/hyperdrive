@@ -83,8 +83,7 @@ def run():
         for j in args.job:
             pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
             print(j)
-            for line in pccl.logs(
-                    timestamps=True, follow=args.follow, tail=args.lines):
+            for line in pccl.logs(follow=args.follow, tail=args.lines):
                 print(line.decode())
     elif args.command == 'deploy':
         pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
