@@ -12,7 +12,7 @@ def _port(arg):
     return '{}/tcp'.format(host_port), container_port
 
 
-def main():
+def parse_args():
     parser = argparse.ArgumentParser(
         description=hyperdrive.__doc__,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -65,7 +65,11 @@ def main():
         ' (example: `-p 8888:8888 -p 8081:8080`'
         ' maps external port 8888 to docker image port 8888 and 8081 to 8080)')
 
-    args, _ = parser.parse_known_args()
+    return parser.parse_known_args()
+
+
+def run():
+    args, _ = parse_args()
 
     if args.command == 'status':
         for j in args.job:
@@ -89,6 +93,12 @@ def main():
         pccl.push()
         pccl.deploy()
         print(pccl.service.name)
+def main():
+    try:
+        run()
+    except Exception as e:
+        # TODO: log verbose error
+        print(getattr(e, 'explanation', e))
 
 
 if __name__ == '__main__':
