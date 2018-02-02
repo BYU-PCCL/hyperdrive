@@ -50,7 +50,8 @@ class Docker:
                     content.append('CMD {}'.format(command))
                 f.writelines(content)
 
-        self.image = self.client.images.build(path=path, tag=tag, pull=pull)
+        self.image = self.client.images.build(
+            path=path, tag=tag, pull=pull, **kwargs)
 
         return self.image
 

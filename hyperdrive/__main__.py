@@ -3,13 +3,20 @@
 """
 from __future__ import print_function
 import argparse
+import docker
 import hyperdrive.provider
 import sys
 
+ports = {}
 
-def _port(arg):
-    host_port, container_port = arg.split(':')
-    return '{}/tcp'.format(host_port), container_port
+
+class StorePort(argparse.Action):
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        for kv in values.split(","):
+            k, v = kv.split(":")
+            ports[int(k)] = int(v)
+        setattr(namespace, self.dest, ports)
 
 
 def parse_args():
@@ -58,9 +65,10 @@ def parse_args():
     deploy_parser.add_argument(
         '-p',
         '--publish',
-        dest='port',
-        nargs='*',
-        type=_port,
+        dest='ports',
+        metavar='EXTERNAL_PORT:CONTAINER_PORT',
+        default={},
+        action=StorePort,
         help='ports to publish to make them available externally'
         ' (example: `-p 8888:8888 -p 8081:8080`'
         ' maps external port 8888 to docker image port 8888 and 8081 to 8080)')
@@ -87,13 +95,11 @@ def run():
                 print(line.decode())
     elif args.command == 'deploy':
         pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
-        pccl.build(
-            args.base_image,
-            path='./',
-            command=args.cmd,
-            ports=dict(args.port or []))
+        pccl.build(args.base_image, path='./', command=args.cmd)
         pccl.push()
-        pccl.deploy()
+        pccl.deploy(
+            endpoint_spec=docker.types.EndpointSpec(
+                mode='vip', ports=args.ports))
         print(pccl.service.name)
     elif args.command == 'remove':
         for j in args.job:
