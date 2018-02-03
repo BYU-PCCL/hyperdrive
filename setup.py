@@ -71,6 +71,8 @@ setup(
     version=hyperdrive.__version__,
     url='http://github.com/BYU-PCCL/hyperdrive',
     license=hyperdrive.__licence__,
+    author='William Myers',
+    author_email='mwilliammyers@gmail.com',
     packages=find_packages(),
     entry_points={
         'console_scripts': ['hyperdrive = hyperdrive.__main__:main'],
