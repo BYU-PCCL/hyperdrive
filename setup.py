@@ -26,16 +26,12 @@ class Clean(Command):
     user_options = []
 
     def initialize_options(self):
-        """Set default values for options."""
         pass
 
     def finalize_options(self):
-        """Post-process options."""
         pass
 
     def run(self):
-        """Run clean."""
-
         def respect_dry_run(path, fn):
             if self.dry_run:
                 print('would remove {}...'.format(path))
