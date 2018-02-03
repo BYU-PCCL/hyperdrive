@@ -85,11 +85,9 @@ setup(
         'clean': Clean,
         'tag': Tag,
     },
+    python_requires='>=3.2',
     classifiers=[
         'Development Status :: 3 - Alpha',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
