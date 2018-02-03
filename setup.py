@@ -51,6 +51,21 @@ class Clean(Command):
             respect_dry_run(f, os.remove)
 
 
+class Tag(Command):
+    description = 'tag the release with git'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        os.system("git tag {}".format(hyperdrive.__version__))
+        os.system("git push --tags")
+
+
 setup(
     name='hyperdrive',
     version=hyperdrive.__version__,
@@ -68,6 +83,7 @@ setup(
     cmdclass={
         'test': PyTest,
         'clean': Clean,
+        'tag': Tag,
     },
     classifiers=[
         'Development Status :: 3 - Alpha',
