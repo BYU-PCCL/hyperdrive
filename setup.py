@@ -73,6 +73,8 @@ setup(
     license=hyperdrive.__licence__,
     author='William Myers',
     author_email='mwilliammyers@gmail.com',
+    description=hyperdrive.__doc__,
+    long_description=hyperdrive.__doc__,
     packages=find_packages(),
     entry_points={
         'console_scripts': ['hyperdrive = hyperdrive.__main__:main'],
