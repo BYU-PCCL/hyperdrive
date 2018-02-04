@@ -5,7 +5,7 @@
 ## Requirements
 
 - [python>=3.2]
-- [pip]
+- [pip3]
 
 ## Installation
 
@@ -43,5 +43,5 @@ python3 setup.py --help-commands
 python3 setup.py test
 ```
 
-[pip]: (https://pip.pypa.io/en/stable/installing/)
 [python>=3.2]: http://docs.python-guide.org/en/latest/starting/installation/
+[pip3]: https://pip.pypa.io/en/stable/installing/
