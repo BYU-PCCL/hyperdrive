@@ -26,6 +26,7 @@ class Docker:
                                                os.path.basename(os.getcwd())),
               command=None,
               pull=True,
+              rm=True,
               shmsize=1000000000,
               **kwargs):
         dockerfile = os.path.join(path, 'Dockerfile')
@@ -51,7 +52,7 @@ class Docker:
                 f.writelines(content)
 
         self.image = self.client.images.build(
-            path=path, tag=tag, pull=pull, **kwargs)
+            path=path, tag=tag, pull=pull, rm=rm, **kwargs)
 
         return self.image
 
