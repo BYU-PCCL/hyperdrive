@@ -126,17 +126,20 @@ class Pccl(Docker):
             except KeyError:
                 pass
 
-    def deploy(self,
-               name='hyperdrive_{}_{}'.format(getpass.getuser(),
-                                              str(uuid.uuid4())[:8]),
-               mode=docker.types.ServiceMode('replicated', replicas=1),
-               restart_policy=docker.types.RestartPolicy(condition='none'),
-               **kwargs):
+    def deploy(
+            self,
+            name='hyperdrive_{}_{}'.format(getpass.getuser(),
+                                           str(uuid.uuid4())[:8]),
+            mode=docker.types.ServiceMode('replicated', replicas=1),
+            restart_policy=docker.types.RestartPolicy(condition='none'),
+            mounts=['/mnt/pccfs:/mnt/pccfs:rw', '/home/remote:/home/remote:rw'],
+            **kwargs):
         self.service = self.client.services.create(
             self.repository,
             name=name,
             mode=mode,
             restart_policy=restart_policy,
+            mounts=mounts,
             **kwargs)
         return self.service
 
