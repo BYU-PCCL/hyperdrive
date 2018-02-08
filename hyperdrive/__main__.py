@@ -54,6 +54,12 @@ def parse_args():
         dest='command', help='interact with jobs on the cluster')
     subparsers.required = True
 
+    list_parser = subparsers.add_parser(
+        'ls',
+        help='list jobs, see also: http://{}:8080'.format(
+            hyperdrive.default_docker_manager_hostname),
+        aliases=['list'])
+
     status_parser = subparsers.add_parser('status', help='get status of jobs')
     status_parser.add_argument('job', nargs='+', help='the name of the job')
 
@@ -103,11 +109,16 @@ def parse_args():
 def run():
     args, _ = parse_args()
 
-    if args.command == 'status':
+    if args.command in ('list', 'ls'):
+        pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
+        for service in pccl.list(filters={'name': 'hyperdrive'}):
+            print(service.name)
+    elif args.command == 'status':
+        from pprint import pprint
+
         for j in args.job:
             pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
 
-            from pprint import pprint
             pprint(pccl.status())
     elif args.command == 'logs':
         for j in args.job:

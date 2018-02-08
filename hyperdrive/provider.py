@@ -140,6 +140,9 @@ class Pccl(Docker):
             **kwargs)
         return self.service
 
+    def list(self, **kwargs):
+        return self.client.services.list(**kwargs)
+
     def logs(self, stdout=True, stderr=True, **kwargs):
         return self.service.logs(stdout=stdout, stderr=stderr, **kwargs)
 
