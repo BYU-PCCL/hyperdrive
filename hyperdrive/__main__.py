@@ -54,25 +54,6 @@ def parse_args():
         dest='command', help='interact with jobs on the cluster')
     subparsers.required = True
 
-    list_parser = subparsers.add_parser(
-        'ls',
-        help='list jobs, see also: http://{}:8080'.format(
-            hyperdrive.default_docker_manager_hostname),
-        aliases=['list'])
-
-    status_parser = subparsers.add_parser('status', help='get status of jobs')
-    status_parser.add_argument('job', nargs='+', help='the name of the job')
-
-    logs_parser = subparsers.add_parser('logs', help='get logs for jobs')
-    logs_parser.add_argument('job', nargs='+', help='the name of the job')
-    logs_parser.add_argument(
-        '-f',
-        '--follow',
-        action='store_true',
-        help='keep connection open to read logs as they are sent from docker')
-    logs_parser.add_argument(
-        '-n', '--lines', default='all', help='number of log lines to print')
-
     deploy_parser = subparsers.add_parser('deploy', help='deploy a job')
     deploy_parser.add_argument(
         '-c', '--command', dest='cmd', help='command to run for the job')
@@ -100,6 +81,25 @@ def parse_args():
         help='resources necessary for the job'
         ' (example: `-r gpu=1` requests one gpu')
 
+    list_parser = subparsers.add_parser(
+        'ls',
+        help='list jobs, see also: http://{}:8080'.format(
+            hyperdrive.default_docker_manager_hostname),
+        aliases=['list'])
+
+    status_parser = subparsers.add_parser('status', help='get status of jobs')
+    status_parser.add_argument('job', nargs='+', help='the name of the job')
+
+    logs_parser = subparsers.add_parser('logs', help='get logs for jobs')
+    logs_parser.add_argument('job', nargs='+', help='the name of the job')
+    logs_parser.add_argument(
+        '-f',
+        '--follow',
+        action='store_true',
+        help='keep connection open to read logs as they are sent from docker')
+    logs_parser.add_argument(
+        '-n', '--lines', default='all', help='number of log lines to print')
+
     remove_parser = subparsers.add_parser('remove', help='remove jobs')
     remove_parser.add_argument('job', nargs='+', help='the name of the job')
 
@@ -109,25 +109,9 @@ def parse_args():
 def run():
     args, _ = parse_args()
 
-    if args.command in ('list', 'ls'):
-        pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
-        for service in pccl.list(filters={'name': 'hyperdrive'}):
-            print(service.name)
-    elif args.command == 'status':
-        from pprint import pprint
+    print(args)
 
-        for j in args.job:
-            pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
-
-            pprint(pccl.status())
-    elif args.command == 'logs':
-        for j in args.job:
-            pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
-
-            print(j)
-            for line in pccl.logs(follow=args.follow, tail=args.lines):
-                print(line.decode())
-    elif args.command == 'deploy':
+    if args.command == 'deploy':
         pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
 
         pccl.build(args.base_image, path='./', command=args.cmd)
@@ -139,6 +123,24 @@ def run():
         pccl.deploy(resources=r, endpoint_spec=e)
 
         print(pccl.service.name)
+    elif args.command in ('list', 'ls'):
+        pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
+
+        for service in pccl.list(filters={'name': 'hyperdrive'}):
+            print(service.name)
+    elif args.command == 'status':
+        from pprint import pprint
+
+        for j in args.job:
+            pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
+            pprint(pccl.status())
+    elif args.command == 'logs':
+        for j in args.job:
+            pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
+
+            print(j)
+            for line in pccl.logs(follow=args.follow, tail=args.lines):
+                print(line.decode())
     elif args.command == 'remove':
         for j in args.job:
             pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
