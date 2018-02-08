@@ -7,6 +7,7 @@ import docker
 import hyperdrive.provider
 import yaml
 import sys
+from halo import Halo
 
 ports = {}
 resources = {}
@@ -118,13 +119,19 @@ def run():
     if args.command == 'deploy':
         pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
 
-        pccl.build(args.base_image, path='./', command=args.cmd)
+        with Halo(text='building image, this could take a while...') as loader:
+            pccl.build(args.base_image, path='./', command=args.cmd)
+            loader.succeed('built image')
 
-        pccl.push()
+        with Halo(text='pushing image, this could take a while...') as loader:
+            pccl.push()
+            loader.succeed('pushed image')
 
-        r = docker.types.Resources(generic_reservations=args.resources)
-        e = docker.types.EndpointSpec(mode='vip', ports=args.ports)
-        pccl.deploy(resources=r, endpoint_spec=e)
+        with Halo(text='deployging image...') as loader:
+            r = docker.types.Resources(generic_reservations=args.resources)
+            e = docker.types.EndpointSpec(mode='vip', ports=args.ports)
+            pccl.deploy(resources=r, endpoint_spec=e)
+            loader.succeed('deployed image')
 
         print(pccl.service.name)
     elif args.command in ('list', 'ls'):
