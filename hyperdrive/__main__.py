@@ -105,7 +105,8 @@ def parse_args():
     logs_parser.add_argument(
         '-n', '--lines', default='all', help='number of log lines to print')
 
-    remove_parser = subparsers.add_parser('remove', help='remove jobs')
+    remove_parser = subparsers.add_parser(
+        'rm', help='remove jobs', aliases=['remove', 'delete', 'destroy'])
     remove_parser.add_argument('job', nargs='+', help='the name of the job')
 
     return parser.parse_known_args()
@@ -153,7 +154,7 @@ def run():
             print(j)
             for line in pccl.logs(follow=args.follow, tail=args.lines):
                 print(line.decode())
-    elif args.command == 'remove':
+    elif args.command in ('rm', 'remove', 'delete', 'destroy'):
         for j in args.job:
             pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
             pccl.remove()
