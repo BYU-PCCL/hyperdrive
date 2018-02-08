@@ -5,6 +5,7 @@ from __future__ import print_function
 import argparse
 import docker
 import hyperdrive.provider
+import yaml
 import sys
 
 ports = {}
@@ -109,8 +110,6 @@ def parse_args():
 def run():
     args, _ = parse_args()
 
-    print(args)
-
     if args.command == 'deploy':
         pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
 
@@ -129,11 +128,9 @@ def run():
         for service in pccl.list(filters={'name': 'hyperdrive'}):
             print(service.name)
     elif args.command == 'status':
-        from pprint import pprint
-
         for j in args.job:
             pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
-            pprint(pccl.status())
+            print(yaml.dump(pccl.status()))
     elif args.command == 'logs':
         for j in args.job:
             pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)

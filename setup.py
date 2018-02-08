@@ -78,7 +78,7 @@ setup(
     entry_points={
         'console_scripts': ['hyperdrive = hyperdrive.__main__:main'],
     },
-    install_requires=['docker==3.1.0.dev0', 'dockerfile>=2.0.0'],
+    install_requires=['docker==3.1.0.dev0', 'dockerfile>=2.0.0', 'pyyaml'],
     tests_require=['pytest'],
     dependency_links=[
         "https://api.github.com/repos/BYU-PCCL/docker-py/tarball/d1ade35#egg=docker-3.1.0.dev0"
