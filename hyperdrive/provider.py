@@ -1,9 +1,10 @@
 import docker
-import errno
+import dockerfile
 import getpass
 import hyperdrive
 import os
 import os.path
+import re
 import uuid
 
 
@@ -18,9 +19,56 @@ class Docker:
     def repository(self):
         return self.image[0].attrs['RepoTags'][-1] if self.image else None
 
+    def _dockerfile_content(self, base_image, command, dockerfile_path,
+                            add_pip_cmd):
+        content = []
+
+        try:
+            has_base_image_cmd = False
+            has_copy_cmd = False
+            has_pip_cmd = False
+            cmd_instructions_count = 0
+
+            for instruction in dockerfile.parse_file(str(dockerfile_path)):
+                if instruction.cmd == 'from':
+                    has_base_image_cmd = True
+                elif instruction.cmd == 'copy':
+                    has_copy_cmd = True
+                elif instruction.cmd in ('cmd', 'entrypoint'):
+                    cmd_instructions_count += 1
+                elif instruction.cmd == 'run':
+                    if not has_pip_cmd and re.search(
+                            "pip.*install.*requirements", instruction.original,
+                            re.IGNORECASE):
+                        has_pip_cmd = True
+                content.append('{}\n'.format(instruction.original))
+
+            if not has_base_image_cmd:
+                content.insert(0, 'FROM {}\n'.format(base_image))
+            if not has_copy_cmd:
+                content.insert(1, 'COPY . .\n')
+            if cmd_instructions_count == 0 and command:
+                content.append('CMD {}\n'.format(command))
+                cmd_instructions_count = 1
+            if add_pip_cmd and not has_pip_cmd:
+                content.insert(
+                    len(content) - cmd_instructions_count,
+                    'RUN pip install -r ./requirements.txt\n')
+        except dockerfile.GoIOError:
+            content = [
+                'FROM {}\n'.format(base_image),
+                'COPY . .\n',
+            ]
+            if add_pip_cmd:
+                content.append('RUN pip install -r ./requirements.txt\n')
+            if command:
+                content.append('CMD {}\n'.format(command))
+
+        return content
+
     def build(self,
               base_image,
-              path='./',
+              path=os.getcwd(),
               tag='{}/hyperdrive-{}-{}'.format(hyperdrive.docker_registry,
                                                getpass.getuser(),
                                                os.path.basename(os.getcwd())),
@@ -29,27 +77,14 @@ class Docker:
               rm=True,
               shmsize=1000000000,
               **kwargs):
-        dockerfile = os.path.join(path, 'Dockerfile')
-        try:
-            handle = os.open(dockerfile, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
-        else:
-            with os.fdopen(handle, 'w') as f:
-                content = [
-                    '# see: https://docs.docker.com/engine/reference/builder/ for Dockerfile reference\n',
-                    'FROM {}\n'.format(base_image),
-                    'COPY . .\n',
-                ]
-                if os.path.isfile(os.path.join(path, 'requirements.txt')):
-                    content += [
-                        'COPY ./requirements.txt .',
-                        'RUN pip install -r ./requirements.txt'
-                    ]
-                if command:
-                    content.append('CMD {}'.format(command))
-                f.writelines(content)
+        dockerfile_path = os.path.join(path, 'Dockerfile')
+        add_pip_cmd = os.path.isfile(os.path.join(path, 'requirements.txt'))
+        dockerfile_content = self._dockerfile_content(
+            base_image, command, dockerfile_path, add_pip_cmd)
+
+        # TODO: make this atomic
+        with open(dockerfile_path, 'w') as f:
+            f.writelines(dockerfile_content)
 
         self.image = self.client.images.build(
             path=path, tag=tag, pull=pull, rm=rm, **kwargs)
