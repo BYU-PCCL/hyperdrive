@@ -45,6 +45,9 @@ def parse_args():
         version='%(prog)s {}'.format(hyperdrive.__version__))
 
     parser.add_argument(
+        '-v', '--verbose', action='count', default=0, help='increase verbosity')
+
+    parser.add_argument(
         '-m',
         '--manager',
         dest='manager_url',
@@ -110,6 +113,8 @@ def parse_args():
 def run():
     args, _ = parse_args()
 
+    hyperdrive.verbosity = args.verbose
+
     if args.command == 'deploy':
         pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
 
@@ -127,6 +132,9 @@ def run():
 
         for service in pccl.list(filters={'name': 'hyperdrive'}):
             print(service.name)
+            if hyperdrive.verbosity > 0:
+                print(yaml.dump(service.attrs), end='\n')
+
     elif args.command == 'status':
         for j in args.job:
             pccl = hyperdrive.provider.Pccl(base_url=args.manager_url, name=j)
