@@ -15,6 +15,6 @@ default_docker_manager_url = os.environ.get(
     'tcp://{}:2375'.format(default_docker_manager_hostname))
 
 default_docker_base_image = os.environ.get('HYPERDRIVE_DOCKER_BASE_IMAGE',
-                                           'ufoym/deepo')
+                                           'pccl/base')
 
 docker_registry = '127.0.0.1:5000'
