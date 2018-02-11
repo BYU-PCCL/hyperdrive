@@ -29,7 +29,7 @@ class Docker:
             has_pip_cmd = False
             cmd_instructions_count = 0
 
-            for instruction in dockerfile.parse_file(str(dockerfile_path)):
+            for instruction in dockerfile.parse_file(dockerfile_path):
                 if instruction.cmd == 'from':
                     has_base_image_cmd = True
                 elif instruction.cmd == 'copy':
@@ -45,11 +45,18 @@ class Docker:
 
             if not has_base_image_cmd:
                 content.insert(0, 'FROM {}\n'.format(base_image))
+            elif base_image != hyperdrive.default_docker_base_image:
+                # only overwrite if the user supplied a custom base_image
+                content[0] = 'FROM {}\n'.format(base_image)
+
             if not has_copy_cmd:
                 content.insert(1, 'COPY . .\n')
-            if cmd_instructions_count == 0 and command:
+
+            if command:
+                content = content[:-cmd_instructions_count or None]
                 content.append('CMD {}\n'.format(command))
                 cmd_instructions_count = 1
+
             if add_pip_cmd and not has_pip_cmd:
                 content.insert(
                     len(content) - cmd_instructions_count,
