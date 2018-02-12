@@ -10,7 +10,7 @@
 ## Installation
 
 ```
-pip3 install git+https://github.com/BYU-PCCL/hyperdrive.git
+pip3 install hyperdrivegi
 ```
 
 ## Usage
