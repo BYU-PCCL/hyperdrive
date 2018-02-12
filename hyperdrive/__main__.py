@@ -76,8 +76,8 @@ def parse_args():
         default={},
         action=StorePort,
         help='ports to publish to make them available externally'
-        ' (example: `-p 8888:8888 -p 8081:8080`'
-        ' maps external port 8888 to docker image port 8888 and 8081 to 8080)')
+             ' (example: `-p 8888:8888 -p 8081:8080`'
+             ' maps external port 8888 to docker image port 8888 and 8081 to 8080)')
     deploy_parser.add_argument(
         '-r',
         '--resources',
@@ -85,9 +85,9 @@ def parse_args():
         default={},
         action=StoreResource,
         help='resources necessary for the job'
-        ' (example: `-r gpu=1` requests one gpu')
+             ' (example: `-r gpu=1` requests one gpu')
 
-    list_parser = subparsers.add_parser(
+    subparsers.add_parser(
         'ls',
         help='list jobs, see also: http://{}:8080'.format(
             hyperdrive.default_docker_manager_hostname),
