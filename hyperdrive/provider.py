@@ -115,7 +115,7 @@ class Docker:
         if image is None:
             image = self.image.id
         # TODO: Handle stopping containers
-        self.client.images.remove(image, force=force, **kwargs)
+        self.client.images.remove()
         self.client.images.prune()
 
 
@@ -159,6 +159,6 @@ class Pccl(Docker):
     def status(self):
         return self.service.tasks()
 
-    def remove(self):
+    def remove(self, **kwargs):
         self.service.remove()
-        super(Pccl, self).remove()
+        # super(Pccl, self).remove(**kwargs)  # FIXME
