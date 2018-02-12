@@ -23,47 +23,71 @@ class Docker:
                             add_pip_cmd):
         content = []
 
+        # TODO: there has to be a better way to construct the Dockerfile content
         try:
-            has_base_image_cmd = False
-            has_copy_cmd = False
-            has_pip_cmd = False
-            cmd_instructions_count = 0
+            instructions = []
+
+            def last_index(item, items, default_index=-1):
+                index = default_index
+                try:
+                    index = max(i for i, v in enumerate(items) if v == item)
+                except ValueError:
+                    pass
+                return index
 
             for instruction in dockerfile.parse_file(dockerfile_path):
-                if instruction.cmd == 'from':
-                    has_base_image_cmd = True
-                elif instruction.cmd == 'copy':
-                    has_copy_cmd = True
-                elif instruction.cmd in ('cmd', 'entrypoint'):
-                    cmd_instructions_count += 1
-                elif instruction.cmd == 'run':
-                    if not has_pip_cmd and re.search(
-                            "pip.*install.*requirements", instruction.original,
-                            re.IGNORECASE):
-                        has_pip_cmd = True
-                content.append('{}\n'.format(instruction.original))
+                cmd = instruction.cmd
 
-            if not has_base_image_cmd:
-                content.insert(0, 'FROM {}\n'.format(base_image))
+                if instruction.cmd == 'run' and re.search(
+                        "pip.*install.*requirements", instruction.original,
+                        re.IGNORECASE):
+                    cmd = 'pip'
+                content.append('{}\n'.format(instruction.original))
+                instructions.append(cmd)
+
+            from_cmd = 'FROM {}\n'.format(base_image)
+            from_index = last_index('from', instructions)
+            if from_index < 0:
+                content.insert(0, from_cmd)
+                instructions.insert(0, 'from')
             elif base_image != hyperdrive.default_docker_base_image:
                 # only overwrite if the user supplied a custom base_image
-                content[0] = 'FROM {}\n'.format(base_image)
+                content[from_index] = from_cmd
 
-            if not has_copy_cmd:
-                content.insert(1, 'COPY . .\n')
+            workdir_index = last_index('workdir', instructions)
+            if workdir_index < 0:
+                workdir_loc = last_index('from', instructions) + 1
+                content.insert(workdir_loc, 'WORKDIR /opt/\n')
+                instructions.insert(workdir_loc, 'workdir')
+
+            copy_index = last_index('copy', instructions)
+            if copy_index < 0:
+                copy_loc = last_index('workdir', instructions) + 1
+                content.insert(copy_loc, 'COPY . .\n')
+                instructions.insert(copy_loc, 'copy')
 
             if command:
-                content = content[:-cmd_instructions_count or None]
-                content.append('CMD {}\n'.format(command))
-                cmd_instructions_count = 1
+                cmd = 'CMD {}\n'.format(command)
+                cmd_index = last_index('cmd', instructions)
+                if cmd_index < 0:
+                    content.append(cmd)
+                    instructions.append('cmd')
+                else:
+                    content[cmd_index] = cmd
+                    instructions[cmd_index] = cmd
 
-            if add_pip_cmd and not has_pip_cmd:
+            if add_pip_cmd and last_index('pip', instructions) < 0:
+                i = len(content) - 1
+                first_cmd_instruction = min(
+                    last_index('cmd', instructions, default_index=i),
+                    last_index('entrypoint', instructions, default_index=i))
                 content.insert(
-                    len(content) - cmd_instructions_count,
+                    first_cmd_instruction,
                     'RUN pip install -r ./requirements.txt\n')
         except dockerfile.GoIOError:
             content = [
                 'FROM {}\n'.format(base_image),
+                'WORKDIR /opt/\n',
                 'COPY . .\n',
             ]
             if add_pip_cmd:
