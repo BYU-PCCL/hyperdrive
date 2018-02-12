@@ -20,12 +20,7 @@ class Docker:
         return self.image[0].attrs['RepoTags'][-1] if self.image else None
 
     def _dockerfile_content(self, base_image, command, dockerfile_path,
-                            add_pip_cmd, user_did_supply_base_image=False):
-        # user_did_supply_base_image = True
-        # if base_image is None:
-        #     user_did_supply_base_image = False
-        #     base_image = hyperdrive.default_docker_base_image_gpu if
-
+                            add_pip_cmd):
         content = []
 
         # TODO: there has to be a better way to construct the Dockerfile content
