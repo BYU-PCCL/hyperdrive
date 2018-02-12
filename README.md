@@ -10,7 +10,7 @@
 ## Installation
 
 ```
-pip3 install hyperdrivegi
+pip3 install hyperdrive
 ```
 
 ## Usage
