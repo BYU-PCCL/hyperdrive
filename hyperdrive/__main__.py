@@ -65,8 +65,9 @@ def parse_args():
     deploy_parser.add_argument(
         '--from',
         dest='base_image',
-        default=hyperdrive.default_docker_base_image,
-        help='the docker image to base built images from')
+        help='the docker image to base built images from (default: {} or {})'
+             ''.format(hyperdrive.default_docker_base_image_cpu,
+                       hyperdrive.default_docker_base_image_gpu))
     deploy_parser.add_argument(
         '-p',
         '--publish',
@@ -121,7 +122,13 @@ def run():
         pccl = hyperdrive.provider.Pccl(base_url=args.manager_url)
 
         with Halo(text='building image, this could take a while...') as loader:
-            pccl.build(args.base_image, path='./', command=args.cmd)
+            base_image = args.base_image
+            if not base_image:
+                base_image = hyperdrive.default_docker_base_image_cpu
+                if any(True for r in args.resources if 'gpu' in r):
+                    base_image = hyperdrive.default_docker_base_image_gpu
+
+            pccl.build(base_image, path='./', command=args.cmd)
             loader.succeed('built image')
 
         with Halo(text='pushing image, this could take a while...') as loader:

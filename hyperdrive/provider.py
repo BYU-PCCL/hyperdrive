@@ -20,7 +20,12 @@ class Docker:
         return self.image[0].attrs['RepoTags'][-1] if self.image else None
 
     def _dockerfile_content(self, base_image, command, dockerfile_path,
-                            add_pip_cmd):
+                            add_pip_cmd, user_did_supply_base_image=False):
+        # user_did_supply_base_image = True
+        # if base_image is None:
+        #     user_did_supply_base_image = False
+        #     base_image = hyperdrive.default_docker_base_image_gpu if
+
         content = []
 
         # TODO: there has to be a better way to construct the Dockerfile content
@@ -50,8 +55,10 @@ class Docker:
             if from_index < 0:
                 content.insert(0, from_cmd)
                 instructions.insert(0, 'from')
-            elif base_image != hyperdrive.default_docker_base_image:
-                # only overwrite if the user supplied a custom base_image
+            # TODO: find a better way to figure out if we should override 'FROM'
+            elif base_image not in (
+                    hyperdrive.default_docker_base_image_gpu,
+                    hyperdrive.default_docker_base_image_cpu):
                 content[from_index] = from_cmd
 
             workdir_index = last_index('workdir', instructions)
