@@ -9,7 +9,7 @@ __licence__ = 'MIT'
 
 verbosity = 0
 
-default_docker_manager_hostname = 'doctor.cs.byu.edu'
+default_docker_manager_hostname = 'monster.cs.byu.edu'
 default_docker_manager_url = os.environ.get(
     'HYPERDRIVE_DOCKER_MANAGER_URL',
     'tcp://{}:2375'.format(default_docker_manager_hostname))
