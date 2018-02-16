@@ -65,10 +65,10 @@ def parse_args():
     subparsers.required = True
 
     deploy_parser = subparsers.add_parser('deploy', help='deploy a job')
-    deploy_parser.add_argument('command', type=str, nargs='?',
+    deploy_parser.add_argument('cmd', type=str, nargs='?',
                                help='command to run for the job')
     # HACK so help output only shows one command
-    deploy_parser.add_argument('_command', type=str, nargs='*',
+    deploy_parser.add_argument('_cmd', type=str, nargs='*',
                                action=CommandAction,
                                help=argparse.SUPPRESS)
 
@@ -139,7 +139,7 @@ def run():
                     base_image = hyperdrive.default_docker_base_image_gpu
 
             # HACK so help output only shows one command
-            cmd = args.command + ' ' + args._command if args.command else None
+            cmd = args.cmd + ' ' + args._cmd if args.cmd else None
             pccl.build(base_image, path='./', command=cmd)
             loader.succeed('built image')
 
