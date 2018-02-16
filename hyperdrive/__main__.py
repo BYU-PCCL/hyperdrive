@@ -13,6 +13,11 @@ ports = {}
 resources = {}
 
 
+class CommandAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, ' '.join(values))
+
+
 class StorePort(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -60,8 +65,13 @@ def parse_args():
     subparsers.required = True
 
     deploy_parser = subparsers.add_parser('deploy', help='deploy a job')
-    deploy_parser.add_argument(
-        '-c', '--command', dest='cmd', help='command to run for the job')
+    deploy_parser.add_argument('command', type=str, nargs='?',
+                               help='command to run for the job')
+    # HACK so help output only shows one command
+    deploy_parser.add_argument('_command', type=str, nargs='*',
+                               action=CommandAction,
+                               help=argparse.SUPPRESS)
+
     deploy_parser.add_argument(
         '--from',
         dest='base_image',
@@ -128,7 +138,9 @@ def run():
                 if any(True for r in args.resources if 'gpu' in r):
                     base_image = hyperdrive.default_docker_base_image_gpu
 
-            pccl.build(base_image, path='./', command=args.cmd)
+            # HACK so help output only shows one command
+            cmd = args.command + ' ' + args._command if args.command else None
+            pccl.build(base_image, path='./', command=cmd)
             loader.succeed('built image')
 
         with Halo(text='pushing image, this could take a while...') as loader:
