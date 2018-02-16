@@ -3,7 +3,7 @@ hyperdrive - run your python projects at light speed.
 """
 import os
 
-__version__ = '0.1.0.beta6'
+__version__ = '0.1.0.beta7'
 __author__ = 'William Myers'
 __licence__ = 'MIT'
 
