@@ -10,7 +10,7 @@ import sys
 from halo import Halo
 
 ports = {}
-resources = {}
+resources = []
 
 
 class CommandAction(argparse.Action):
@@ -33,9 +33,9 @@ class StoreResource(argparse.Action):
         for kv in values.split(","):
             k, v = kv.split("=")
             try:
-                resources[k] = int(v)
+                resources.append({'DiscreteResourceSpec': {'Kind': k, 'Value': int(v)}})
             except ValueError:
-                resources[k] = v
+                resources.append({'NamedResourceSpec': {'Kind': k, 'Value': v}})
         setattr(namespace, self.dest, resources)
 
 
@@ -92,7 +92,7 @@ def parse_args():
         '-r',
         '--resources',
         metavar='RESOURCE',
-        default={},
+        default=[],
         action=StoreResource,
         help='resources necessary for the job'
              ' (example: `-r gpu=1` requests one gpu')
@@ -148,7 +148,7 @@ def run():
             loader.succeed('pushed image')
 
         with Halo(text='deployging image...') as loader:
-            r = docker.types.Resources(generic_reservations=args.resources)
+            r = docker.types.Resources(generic_resources=args.resources)
             e = docker.types.EndpointSpec(mode='vip', ports=args.ports)
             pccl.deploy(resources=r, endpoint_spec=e)
             loader.succeed('deployed image')
