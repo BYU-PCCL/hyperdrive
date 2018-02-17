@@ -134,8 +134,11 @@ def run():
         with Halo(text='building image, this could take a while...') as loader:
             base_image = args.base_image
             if not base_image:
+                def resource_is_gpu(r, specs=('DiscreteResourceSpec', 'NamedResourceSpec')):
+                    return any(r.get(s, {}).get('Kind', '').lower() == 'gpu' for s in specs)
+
                 base_image = hyperdrive.default_docker_base_image_cpu
-                if any(True for r in args.resources if 'gpu' in r):
+                if any(True for r in args.resources if resource_is_gpu(r)):
                     base_image = hyperdrive.default_docker_base_image_gpu
 
             # HACK so help output only shows one command
