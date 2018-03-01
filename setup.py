@@ -41,8 +41,8 @@ class Clean(Command):
                 fn(path)
 
         for d in [
-                './dist/', './build/', './__pycache__/',
-                './hyperdrive.egg-info/', './test/__pycache__'
+            './dist/', './build/', './__pycache__/',
+            './hyperdrive.egg-info/', './test/__pycache__'
         ]:
             if os.path.isdir(d):
                 respect_dry_run(d, shutil.rmtree)
@@ -80,12 +80,9 @@ setup(
         'console_scripts': ['hyperdrive = hyperdrive.__main__:main'],
     },
     install_requires=[
-        'docker==3.1.0.dev0', 'dockerfile>=2.0.0', 'pyyaml', 'halo'
+        'docker>=3.1.0', 'dockerfile>=2.0.0', 'pyyaml', 'halo'
     ],
     tests_require=['pytest'],
-    dependency_links=[
-        "https://api.github.com/repos/BYU-PCCL/docker-py/tarball/d1ade35#egg=docker-3.1.0.dev0"
-    ],
     cmdclass={
         'test': PyTest,
         'clean': Clean,
