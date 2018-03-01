@@ -90,7 +90,7 @@ setup(
     },
     python_requires='>=3.2',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 2 - Beta',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
