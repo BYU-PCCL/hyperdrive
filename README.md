@@ -10,7 +10,7 @@
 ## Installation
 
 ```
-pip3 install hyperdrive
+pip3 install https://api.github.com/repos/BYU-PCCL/hyperdrive/tarball/42d1039
 ```
 
 ## Usage
